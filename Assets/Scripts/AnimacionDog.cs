@@ -13,9 +13,9 @@ public class AnimacionDog : MonoBehaviour {
 	
     IEnumerator ladrido()
     {
-        animator.SetBool("isOler", true);
+        
         yield return new WaitForSeconds(4);
-        animator.SetBool("isOler", false);
+       
 
     }
 }
