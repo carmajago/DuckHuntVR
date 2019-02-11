@@ -41,7 +41,7 @@ GameObject:
   - component: {fileID: 65334936478629902}
   m_Layer: 0
   m_Name: Pato 1
-  m_TagString: Untagged
+  m_TagString: pato
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -76,7 +76,7 @@ GameObject:
   - component: {fileID: 61847109462527654}
   m_Layer: 0
   m_Name: Pato 1
-  m_TagString: Untagged
+  m_TagString: pato
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -130,7 +130,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1916743292131736}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.25, y: -2.49, z: 0}
+  m_LocalPosition: {x: 0, y: -2.43, z: 0.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4622705818692636}
@@ -572,8 +572,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   time_fly: 6
-  speed: 3
+  speed: 8
   duck_sprite: {fileID: 0}
+  point: {fileID: 1099358096052180, guid: d2b4c31e457f98b4c9fe97ebdf9b9c6d, type: 2}
   sound_cuak: {fileID: 82660745284817912}
   sound_fall: {fileID: 82977218427502214}
   sound_lands: {fileID: 82048192862227292}
@@ -622,7 +623,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300024, guid: ee596b65e0388334f91ab1a784a1a63f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

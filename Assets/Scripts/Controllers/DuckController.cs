@@ -8,14 +8,15 @@ public class DuckController : MonoBehaviour {
     public float time_fly = 5;
     public float speed = 1.5f;
     public SpriteRenderer duck_sprite;
-
+    public GameObject point;
     public AudioSource sound_cuak;
     public AudioSource sound_fall;
     public AudioSource sound_lands;
-
-    public Image bg;
+    private GameObject bg;
+    
 
     private bool init=false;
+    private bool cayo=false;
     private AudioSource sound;
 
 
@@ -28,7 +29,10 @@ public class DuckController : MonoBehaviour {
         StartCoroutine(sonar());
         StartCoroutine(cuak());
         StartCoroutine(parpadearSprite());
-       
+        bg = GameObject.FindGameObjectWithTag("Bg");
+        bg.GetComponent<Image>().enabled = false;
+        bg.GetComponentInChildren<SpriteRenderer>().enabled = false;
+
 
     }
     private void Update()
@@ -40,6 +44,8 @@ public class DuckController : MonoBehaviour {
     {
         if (!muerto)
         {
+            GameObject.FindObjectOfType<GameController>().ducks_kill++;
+
             duck_sprite.enabled = (true);
             salida = true;
 
@@ -47,7 +53,7 @@ public class DuckController : MonoBehaviour {
             StopAllCoroutines();
             StartCoroutine(animacion_morir());
             //GetComponent<Collider2D>().enabled = false;
-            Destroy(this.gameObject, 3.5f);
+           
         }
         muerto = true;
 
@@ -60,10 +66,14 @@ public class DuckController : MonoBehaviour {
 
         float cont = 0;
         transform.eulerAngles = new Vector3(0, 0, 180);
+        GameObject point_temp = Instantiate(point, new Vector3(transform.position.x+0.74f, transform.position.y+1.24f, transform.position.z), Quaternion.identity);
 
+        Destroy(point_temp, 0.5f);
         yield return new WaitForSeconds(0.5f);
         sound_fall.Play();
-        while (cont < 1f)
+ 
+
+        while (!cayo)
         {
             transform.Translate(Vector3.up * Time.fixedDeltaTime *4);
             cont += 0.01f;
@@ -73,7 +83,6 @@ public class DuckController : MonoBehaviour {
      
         
 
-        GameObject.FindObjectOfType<GameController>().pato1_capturado();
 
 
     }
@@ -136,20 +145,22 @@ public class DuckController : MonoBehaviour {
         }
         transform.eulerAngles = new Vector3(0, 0, Random.Range(-15, 15));
 
-        //GameObject.FindGameObjectWithTag("Bg").GetComponent<Image>().enabled = true;
+        bg.GetComponent<Image>().enabled = true;
+        bg.GetComponentInChildren<SpriteRenderer>().enabled = true;
         //GetComponent<Collider2D>().enabled=false;
         salida = true;
-        //bg.color = new Color32(252, 188, 176,255);
+ 
         yield return new WaitForSeconds(1.5f);
         GameObject.FindObjectOfType<GameController>().pato_perdido();
-        GameObject.FindGameObjectWithTag("Bg").GetComponent<Image>().enabled = false;
+        bg.GetComponent<Image>().enabled = false;
+        bg.GetComponentInChildren<SpriteRenderer>().enabled = false;
 
         StopCoroutine("parpadearSprite");
         duck_sprite.enabled = (true);
        
 
 
-        Destroy(this.gameObject,2);
+        Destroy(this.gameObject,1);
     }
 
     IEnumerator sonar_caida()
@@ -159,10 +170,14 @@ public class DuckController : MonoBehaviour {
         sound_lands.Play();
 
         yield return new WaitForSeconds(0.5f);
+        GameObject.FindObjectOfType<GameController>().pato1_capturado();
+        cayo = true;
+        Destroy(this.gameObject, 1.5f);
+
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log(collision.gameObject.name);
+
         if(init && collision.gameObject.name == "caida")
         {
             StartCoroutine(sonar_caida());

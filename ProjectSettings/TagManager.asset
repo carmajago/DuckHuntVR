@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - Bg
+  - FxTemporaire
+  - projectile
+  - pato
+  - perfect
   layers:
   - Default
   - TransparentFX

@@ -1,12 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
-public class GameController : MonoBehaviour {
+public class GameController : MonoBehaviour
+{
 
-    public int level=1;
-    public int dificulty=1;
+    public int round = 1;
+    public int dificulty = 1;
     public int score = 0;
+    public int min_ducks = 6;
+    public int ducks_kill = 0;
+
+    public AudioSource gameOver;
+    public AudioSource fail;
+    public AudioSource perfec;
+    public AudioSource roundClear;
+    public AudioSource countingHits;
 
     public GameObject perro_miedo;
     public GameObject perro_captura_1;
@@ -14,62 +24,139 @@ public class GameController : MonoBehaviour {
     public List<GameObject> duck_sprites;
     public GameObject duck_prefab;
     public GunController gunController;
-    private int contador_patos;
 
+    public TextMeshProUGUI score_text;
+    public TextMeshProUGUI round_text;
+
+    private int contador_patos;
+    private CountGUIDucksController countGUI;
     private void Start()
     {
         gunController = GameObject.FindObjectOfType<GunController>();
-        if(dificulty == 1)
-        StartCoroutine(crearPato_1());
+        if (dificulty == 1)
+            StartCoroutine(crearPato_1());
         else
-        StartCoroutine(crearPato_2());
+            StartCoroutine(crearPato_2());
+
+        countGUI = GameObject.FindObjectOfType<CountGUIDucksController>();
+        countGUI.refrescarDifucultad(min_ducks);
     }
 
 
 
     public IEnumerator crearPato_1()
     {
-        GameObject duck = null;
         yield return new WaitForSeconds(8f);
-
-        while (contador_patos < 10)
+        while (true)
         {
-            if(duck == null)
-            {
-                Debug.Log(contador_patos);
+            contador_patos = 0;
+            ducks_kill = 0;
+            GameObject duck = null;
+            round_text.text = round.ToString();
 
-                gunController.recargar();
-               
-                duck= Instantiate(duck_prefab);
-                duck.GetComponent<DuckController>().duck_sprite = duck_sprites[contador_patos].GetComponent<SpriteRenderer>();
-                contador_patos++;
+            while (contador_patos < 11 )
+            {
+              
+                if (duck == null)
+                {
+
+                    if (contador_patos == 10)
+                    {
+                        contador_patos++;
+                        break;
+                    }
+                    gunController.recargar();
+
+                    duck = Instantiate(duck_prefab);
+                    duck.GetComponent<DuckController>().duck_sprite = duck_sprites[contador_patos].GetComponent<SpriteRenderer>();
+                    contador_patos++;
+                }
+                yield return new WaitForSeconds(0.1f);
             }
-            yield return new WaitForSeconds(0.1f);
+            for (int i = 0; i < 10; i++)
+            {
+
+                if (duck_sprites[i].GetComponent<SpriteRenderer>().color == Color.red)
+                {
+                    if (i > 0)
+                        if (duck_sprites[i - 1].GetComponent<SpriteRenderer>().color != Color.red)
+                        {
+                            duck_sprites[i - 1].GetComponent<SpriteRenderer>().color = Color.red;
+                            duck_sprites[i].GetComponent<SpriteRenderer>().color = Color.white;
+                            i-=2;
+                            countingHits.Play();
+                            yield return new WaitForSeconds(0.3f);
+                        }
+                }
+            }
+
+            StartCoroutine(parpadearPatos());
+    
+
+
+            if (ducks_kill < min_ducks) {
+
+                fail.Play();
+                yield return new WaitForSeconds(2f);
+                gameOver.Play();
+                break;
+            }else if (ducks_kill == 10)
+            {
+                roundClear.Play();
+                yield return new WaitForSeconds(4.5f);
+                GameObject.FindGameObjectWithTag("perfect").GetComponent<SpriteRenderer>().enabled = true;
+                perfec.Play();
+                yield return new WaitForSeconds(2f);
+
+                GameObject.FindGameObjectWithTag("perfect").GetComponent<SpriteRenderer>().enabled = false;
+
+
+
+
+            }
+            else
+            {
+                roundClear.Play();
+                yield return new WaitForSeconds(5f);
+
+            }
+
+
+
+            if (min_ducks < 10)
+                min_ducks++;
+            countGUI.refrescarDifucultad(min_ducks);
+
+            despintarPatos();
+            round++;
         }
 
-
+       
     }
+  
     public IEnumerator crearPato_2()
     {
-        GameObject duck = null;
-        yield return new WaitForSeconds(8f);
-
-        while (contador_patos < 10)
-        {
-            if (duck == null)
-            {
-                Debug.Log(contador_patos);
-                gunController.recargar();
-
-                duck = Instantiate(duck_prefab);
-                duck.GetComponent<DuckController>().duck_sprite = duck_sprites[contador_patos].GetComponent<SpriteRenderer>();
-                contador_patos++;
-            }
-            yield return new WaitForSeconds(0.1f);
-        }
-
+        yield return null;
 
     }
+    public IEnumerator parpadearPatos()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+
+            foreach (var item in duck_sprites)
+            {
+                item.SetActive(false);
+            }
+            yield return new WaitForSeconds(0.1f);
+
+            foreach (var item in duck_sprites)
+            {
+                item.SetActive(true);
+            }
+        }
+    }
+
     public void pato_perdido()
     {
         perro_miedo.GetComponent<Animator>().SetTrigger("inicio");
@@ -90,5 +177,12 @@ public class GameController : MonoBehaviour {
 
     }
 
+    public void despintarPatos()
+    {
+        foreach (var item in duck_sprites)
+        {
+            item.GetComponent<SpriteRenderer>().color = Color.white;
+        }
+    }
 
 }
